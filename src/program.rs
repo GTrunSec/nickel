@@ -1342,6 +1342,7 @@ Assume(#alwaysTrue -> #alwaysFalse, not ) true
 
     #[test]
     fn multiline_string_indent() {
+        // /!\ Trailing spaces on the first line are on purpose, don't remove ! /!\
         assert_peq!(
             r##"  
                 m#"
@@ -1351,8 +1352,10 @@ Assume(#alwaysTrue -> #alwaysFalse, not ) true
                    text
                 "#m
             "##,
-            "\"this\n    is an\n    indented\ntext\"");
+            "\"this\n    is an\n    indented\ntext\""
+        );
 
+        // /!\ Trailing spaces on the first line are on purpose, don't remove ! /!\
         assert_peq!(
             r##"  
                 m#"
@@ -1361,9 +1364,10 @@ Assume(#alwaysTrue -> #alwaysFalse, not ) true
                        indented
                    text"#m
             "##,
-            "\"this\n    is an\n    indented\ntext\"");
+            "\"this\n    is an\n    indented\ntext\""
+        );
 
-        // /!\ Trailing spaces on the empty line are on purpose, don't remove ! /!\
+        // /!\ Trailing spaces on the middle line are on purpose, don't remove ! /!\
         assert_peq!(
             r##"  
                 m#"
@@ -1372,7 +1376,8 @@ Assume(#alwaysTrue -> #alwaysFalse, not ) true
                     empty line indent
                 "#m
             "##,
-            "\"ignore\n\n empty line indent\"");
+            "\"ignore\n\n empty line indent\""
+        );
 
         assert_peq!(
             r##"  
@@ -1382,8 +1387,8 @@ Assume(#alwaysTrue -> #alwaysFalse, not ) true
                     first line indent
                 "#m
             "##,
-            "\"\nignore\n first line indent\"");
-
+            "\"\nignore\n first line indent\""
+        );
     }
 
     #[test]
@@ -1412,7 +1417,46 @@ Assume(#alwaysTrue -> #alwaysFalse, not ) true
                    ${"${m##"te"##m}xt"}
                 "#m
             "###,
-            "\"this\n    is an\n    indented\ntext\"");
-        
+            "\"this\n    is an\n    indented\ntext\""
+        );
+
+        assert_peq!(
+            r##"
+                let x = "I\n need\n  indent!" in
+                m#"
+                  base
+                    ${x}
+                  ${x}
+                "#m
+            "##,
+            r#""base
+  I
+   need
+    indent!
+I
+ need
+  indent!""#
+        );
+
+        assert_peq!(
+            r##"
+                let x = "ignore\nmy\nindent" in
+                let y = "me\ntoo" in
+                m#"
+                  strip
+                    ${x} ${y}
+                    ${"not\nme"}
+                "#m
+            "##,
+            r#""strip
+  strip
+  ignore
+my
+indent me
+too
+  not
+  me
+            ""#
+        );
     }
 }
