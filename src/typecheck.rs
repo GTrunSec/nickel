@@ -457,7 +457,7 @@ fn type_check_(
                 .try_for_each(|chunk| -> Result<(), TypecheckError> {
                     match chunk {
                         StrChunk::Literal(_) => Ok(()),
-                        StrChunk::Expr(t) => type_check_(
+                        StrChunk::Expr(t, _) => type_check_(
                             state,
                             envs.clone(),
                             strict,
@@ -1392,7 +1392,7 @@ pub fn get_uop_type(
             Box::new(TypeWrapper::Concrete(AbsType::Num())),
         )),
         // This should not happen, as ChunksConcat() is only produced during evaluation.
-        UnaryOp::ChunksConcat(_, _) => panic!("cannot type ChunksConcat()"),
+        UnaryOp::ChunksConcat(_, _, _) => panic!("cannot type ChunksConcat()"),
         // forall rows. { rows } -> List
         UnaryOp::FieldsOf() => TypeWrapper::Concrete(AbsType::arrow(
             Box::new(TypeWrapper::Concrete(AbsType::StaticRecord(Box::new(

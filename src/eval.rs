@@ -261,15 +261,15 @@ where
                     env: HashMap::new(),
                 },
                 Some(chunk) => {
-                    let arg = match chunk {
-                        StrChunk::Literal(s) => Term::Str(s).into(),
-                        StrChunk::Expr(e) => e,
+                    let (arg, indent) = match chunk {
+                        StrChunk::Literal(s) => (Term::Str(s).into(), 0),
+                        StrChunk::Expr(e, indent) => (e, indent),
                     };
 
                     Closure {
                         body: RichTerm {
                             term: Box::new(Term::Op1(
-                                UnaryOp::ChunksConcat(String::new(), chunks),
+                                UnaryOp::ChunksConcat(indent, String::new(), chunks),
                                 arg,
                             )),
                             pos,
@@ -754,7 +754,7 @@ mod tests {
     fn interpolation_simple() {
         let mut chunks = vec![
             StrChunk::Literal(String::from("Hello")),
-            StrChunk::Expr(
+            StrChunk::expr(
                 Term::Op2(
                     BinaryOp::PlusStr(),
                     Term::Str(String::from(", ")).into(),
@@ -763,7 +763,7 @@ mod tests {
                 .into(),
             ),
             StrChunk::Literal(String::from(" How")),
-            StrChunk::Expr(RichTerm::ite(
+            StrChunk::expr(RichTerm::ite(
                 Term::Bool(true).into(),
                 Term::Str(String::from(" are")).into(),
                 Term::Str(String::from(" is")).into(),
@@ -783,7 +783,7 @@ mod tests {
     fn interpolation_nested() {
         let mut inner_chunks = vec![
             StrChunk::Literal(String::from(" How")),
-            StrChunk::Expr(
+            StrChunk::expr(
                 Term::Op2(
                     BinaryOp::PlusStr(),
                     Term::Str(String::from(" ar")).into(),
@@ -791,7 +791,7 @@ mod tests {
                 )
                 .into(),
             ),
-            StrChunk::Expr(RichTerm::ite(
+            StrChunk::expr(RichTerm::ite(
                 Term::Bool(true).into(),
                 Term::Str(String::from(" you")).into(),
                 Term::Str(String::from(" me")).into(),
@@ -801,7 +801,7 @@ mod tests {
 
         let mut chunks = vec![
             StrChunk::Literal(String::from("Hello, World!")),
-            StrChunk::Expr(Term::StrChunks(inner_chunks).into()),
+            StrChunk::expr(Term::StrChunks(inner_chunks).into()),
             StrChunk::Literal(String::from("?")),
         ];
         chunks.reverse();
