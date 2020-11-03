@@ -7,7 +7,6 @@ use codespan::Files;
 fn parse(s: &str) -> Option<RichTerm> {
     let id = Files::new().add("<test>", String::from(s));
 
-    println!("Parsing {}", s);
     super::grammar::TermParser::new()
         .parse(id, Lexer::new(&s))
         .map_err(|err| println!("{:?}", err))
@@ -112,8 +111,6 @@ fn ite() {
 
 #[test]
 fn applications() {
-    println!("1 true 2: {:?}", parse_without_pos("1 true 2"));
-
     assert_eq!(
         parse_without_pos("1 true 2"),
         RichTerm::app(
