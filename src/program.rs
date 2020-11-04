@@ -1449,14 +1449,12 @@ I
                 "#m
             "##,
             r#""strip
-  strip
   ignore
 my
 indent me
 too
   not
-  me
-            ""#
+  me""#
         );
     }
 }
